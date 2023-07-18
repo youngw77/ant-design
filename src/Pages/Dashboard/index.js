@@ -6,7 +6,7 @@ import {
 } from "@ant-design/icons";
 import { Typography, Space, Card, Statistic, Table } from "antd";
 import { useState, useEffect } from "react";
-import { getOrders, getRevenue } from "../../API";
+import { getCustomers, getInventory, getOrders, getRevenue } from "../../API";
 
 import{
     Chart as ChartJS,
@@ -29,6 +29,24 @@ ChartJS.register(
 )
 
 function Dashboard() {
+     const [orders, setOrders] = useState(0);
+     const [inventory, setInventory] = useState(0);
+     const [customers, setCustomers] = useState(0);
+     const [reveneu, setReveneu] = useState(0);
+
+     useEffect(() => {
+        getOrders().then(res => {
+            setOrders(res.total);
+            setReveneu(res.discountedTotal);
+        });
+        getInventory().then(res => {
+            setInventory(res.total);
+        });
+        getCustomers().then(res => {
+            setCustomers(res.total);
+        });
+     },[])
+
   return (
     <Space size={20} direction="vertical">
       <Typography.Title level={4}>Recent Orders</Typography.Title>
@@ -46,7 +64,7 @@ function Dashboard() {
             />
           }
           title="Orders"
-          value={12345}
+          value={orders}
         />
         <DashboardCard
           icon={
@@ -61,7 +79,7 @@ function Dashboard() {
             />
           }
           title="Inventory"
-          value={12345}
+          value={inventory}
         />
         <DashboardCard
           icon={
@@ -76,7 +94,7 @@ function Dashboard() {
             />
           }
           title="Customer"
-          value={12345}
+          value={customers}
         />
         <DashboardCard
           icon={
@@ -91,7 +109,7 @@ function Dashboard() {
             />
           }
           title="Revenue"
-          value={12345}
+          value={reveneu}
         />
       </Space>
       <Space>
@@ -177,8 +195,6 @@ function DashBoardChart() {
         setReveneuData(dataSource);
     });
     },[]);
-
-    const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     const options = {
         responsive: true,
         plugins: {
@@ -191,21 +207,6 @@ function DashBoardChart() {
           },
         },
       };
-    const data = {
-    labels,
-    datasets: [
-        {
-        label: 'Dataset 1',
-        data: labels.map(() => Math.random()*1000),
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        },
-        {
-        label: 'Dataset 2',
-        data: labels.map(() => Math.random()*1000),
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
-        },
-    ],
-    };
     return (
         <Card style={{width: 500, height: 400}}>
             <Bar options={options} data={reveneuData} />
